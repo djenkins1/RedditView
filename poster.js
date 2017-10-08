@@ -80,8 +80,7 @@ $( document ).ready( function()
 {
     $( "#waiting" ).css( "display" , "none" );
     $( "#mainBodyDown" ).html( "Select or search for a subreddit to begin." );
-    $( "button.redditSelect" ).on( "click" , searchSubredditByClick );
-    $( "#searchButton" ).on( "click" , searchSubredditByForm );
+    setupHandlers();
 });
 
 

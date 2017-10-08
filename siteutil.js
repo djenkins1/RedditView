@@ -152,4 +152,26 @@ function handleSubreddit( data, status )
     outputSubreddit( responseObj,responseObjAll.data.after );
 }
 
+function addFavorite( favStr )
+{
+    //TODO: prevent xss
+    //TODO: cookies
+    //TODO: add favStr to dropdown menu
+    console.log( favStr );
+}
+
+function handleAddFavorite()
+{
+    addFavorite( $( "#favInput" ).val() );
+    $( "#closeFavModal" ).click();
+}
+
+function setupHandlers()
+{
+    $( "button.redditSelect" ).on( "click" , searchSubredditByClick );
+    $( "#searchButton" ).on( "click" , searchSubredditByForm );
+    $( "#favPopModal" ).on( "click" , function() { $( "#favModal" ).modal(); } );
+    $( "#addFavSubmitBtn" ).on( "click" , handleAddFavorite );
+}
+
 

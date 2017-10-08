@@ -9,6 +9,7 @@
     <script src="jquery-3.2.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+    <script src="jscookie.js"></script>
     <script src="siteutil.js"></script>
     <script src="poster.js"></script>
 </head>
@@ -22,9 +23,9 @@
                 Favorites
               </button>
               <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
-                <button class="dropdown-item redditSelect" type="button">Yogscast</button>
+                <button id="favPopModal" class="dropdown-item" type="button">Add Favorite</button>
                 <button class="dropdown-item redditSelect" type="button">cscareerquestions</button>
-                <button class="dropdown-item redditSelect" type="button">Something else here</button>
+                <button class="dropdown-item redditSelect" type="button">Yogscast</button>
               </div>
             </div>
             <input id="redditSearch" class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
@@ -36,6 +37,25 @@
     </div>
     <div id="mainBodyDown">
     </div>
+</div>
+<div id="favModal" class="modal" style="display: none;">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Favorite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input id="favInput" class="form-control mr-sm-2" type="text" value="" placeholder="Enter Favorite">
+      </div>
+      <div class="modal-footer">
+        <button id="addFavSubmitBtn" type="button" class="btn btn-primary">Add</button>
+        <button id="closeFavModal" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
 </div>
 </body>
 </html>

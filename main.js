@@ -286,8 +286,7 @@ $( document ).ready( function()
 {
     $( "#searchDate" ).val( getFormatCurrentDate() );
     searchSubreddit( currentSubreddit, true );
-    $( "button.redditSelect" ).on( "click" , searchSubredditByClick );
-    $( "#searchButton" ).on( "click" , searchSubredditByForm );
+    setupHandlers();
 });
 
 
