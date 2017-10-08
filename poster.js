@@ -11,8 +11,7 @@ function showPosterResults( allPosterDict )
     $( "#mainBodyDown" ).append( myGroup );
 
     //stop showing the waiting text
-    $( "#waiting" ).css( "display" , "none" );
-    setProgress( 0 );
+    finishProgress();
 
     //put each of the key value pairs of allPosterDict into an array of tuples
     var keyValues = [];

@@ -195,8 +195,7 @@ function outputCard( cardDecks, myDeckIndex, myData )
 function stopSearch( message )
 {
     console.log( message );
-    $( "#waiting" ).css( "display" , "none" );
-    setProgress( 0 );
+    finishProgress();
     repositionCards();
 }
 

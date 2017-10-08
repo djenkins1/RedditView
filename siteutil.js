@@ -1,5 +1,8 @@
 var currentSubreddit = "Yogscast";
 
+var progressUpdatedTimes = 0;
+var canUpdateProgress = true;
+
 function requestSubreddit( subredditName, afterParam )
 {
     currentSubreddit = subredditName;
@@ -9,13 +12,26 @@ function requestSubreddit( subredditName, afterParam )
         paramObj[ "after" ] = afterParam;
     }
 
-    updateProgress( 5 );
+    updateProgress();
     var urlGet =  "https://www.reddit.com/r/" + encodeURIComponent( subredditName ) + "/new/.json" 
     $.get( urlGet, paramObj, handleSubreddit );
 }
 
+function hideProgress()
+{
+    $( "#waiting" ).css( "display" , "none" );
+    setProgress( 0 );
+}
+
+function finishProgress()
+{
+    animateIncrementProgress( 105, hideProgress, 80 );
+}
+
 function setProgress( val )
 {
+    progressUpdatedTimes = 0;
+    canUpdateProgress = false;
     $( '#waiting .progress-bar' ).each( function()
     {
         $( this ).css( 'width', val + '%' ).attr( 'aria-valuenow', val ); 
@@ -23,14 +39,38 @@ function setProgress( val )
     );
 }
 
-function updateProgress( incrementVal )
+function animateIncrementProgress( maxValue, onFinish, time )
 {
+    if ( !canUpdateProgress )
+    {
+        return;
+    }
+
     $( '#waiting .progress-bar' ).each( function()
     {
-        var newVal = parseInt( $( this ).attr( 'aria-valuenow' ) ) + incrementVal;
-        $( this ).css( 'width', newVal + '%' ).attr( 'aria-valuenow', newVal ); 
+        var newVal = parseInt( $( this ).attr( 'aria-valuenow' ) ) + 1;
+        if ( newVal <= maxValue )
+        {
+            $( this ).css( 'width', newVal + '%' ).attr( 'aria-valuenow', newVal ); 
+            setTimeout( function() { animateIncrementProgress( maxValue, onFinish, time ) } , time );
+        }
+        else
+        {
+            onFinish();
+        }
     }
     );
+}
+
+function updateProgress()
+{
+    if ( !canUpdateProgress )
+    {
+        return;
+    }
+    progressUpdatedTimes += 1;    
+    var maxValue = progressUpdatedTimes * 5;
+    animateIncrementProgress( maxValue, function() { }, 750 );
 }
 
 function searchSubreddit( subredditName, ignoreWaiting, afterParam )
@@ -40,6 +80,8 @@ function searchSubreddit( subredditName, ignoreWaiting, afterParam )
         return;
     }
 
+    setProgress( 0 );
+    canUpdateProgress = true;
     $( "#waiting" ).css( "display" , "flex" );
     clearBody( "#mainBodyDown" );
     requestSubreddit( subredditName, afterParam );
@@ -105,7 +147,7 @@ function handleSubreddit( data, status )
     var responseObjAll = data;
     //var responseObj = responseObjAll.body.data.children;
     var responseObj = responseObjAll.data.children;
-    updateProgress( 5 );
+    updateProgress();
     //outputSubreddit( responseObj,responseObjAll.body.data.after );
     outputSubreddit( responseObj,responseObjAll.data.after );
 }
