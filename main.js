@@ -16,6 +16,62 @@ function createCard()
     return myDiv;
 }
 
+/*
+    Go through all the cards on the page and reposition the dummy-cards so that they are at the end of the page.
+    This gets rid of any gaps.
+*/
+function repositionCards()
+{
+    var myDecks = $( "div.card-deck" );
+    if ( myDecks.length == 0 )
+    {
+        console.log( "NO DECKS" );
+        return;
+    }
+
+    var nonDummyCards = [];
+    var dummyCards = [];
+    $( "div.card" ).each( function()
+    {
+        $( this ).detach();
+        if ( $( this ).hasClass( "dummy-card" ) )
+        {
+            dummyCards.push( $( this ) );
+        }
+        else
+        {
+            nonDummyCards.push( $( this ) );
+        }
+    });
+
+    //reattach the cards to the rows in order
+    var i;
+    for ( i = 0; i < nonDummyCards.length; i++ )
+    {
+        var deckIndex = Math.floor( i / 4 );
+        $( myDecks ).eq( deckIndex ).append( nonDummyCards[ i ] );
+    }
+
+    //append the dummy cards to the ending rows
+    var lastCardIndex = i;
+    for ( i = 0; i < dummyCards.length; i++ )
+    {
+        var deckIndex = Math.floor( ( lastCardIndex + i ) / 4 );
+        $( myDecks ).eq( deckIndex ).append( dummyCards[ i ] );
+    }
+
+    //remove any rows that are all dummy-cards
+    /*
+    var lastDeck = $( myDecks ).eq( myDecks.length - 1 );
+    if ( $( lastDeck ).children( ".dummy-card" ) == 4 )
+    {
+
+    }
+    */
+
+
+}
+
 //creates and returns an h4.card-title skeleton
 //does NOT add the <h4> to the DOM
 function createCardTitle()
@@ -125,18 +181,23 @@ function cardFactoryFromPost( myData, myDeck )
         cardDecks: a list of jquery objects,each element is a div.card-deck
         myDeckIndex: the index in the cardDecks that the card is meant to be added to
         myData: An object representing a reddit post
-    Return: Nothing
+    Return: jQuery object of the div.card returned from cardFactoryFromPost
 */
 function outputCard( cardDecks, myDeckIndex, myData )
 {
-    cardFactoryFromPost( myData, cardDecks[ myDeckIndex ] );
+    return cardFactoryFromPost( myData, cardDecks[ myDeckIndex ] );
 }
 
+/*
+    Hides the progress bar and resets it back to zero.
+    Logs the message given to the console
+*/
 function stopSearch( message )
 {
     console.log( message );
     $( "#waiting" ).css( "display" , "none" );
     setProgress( 0 );
+    repositionCards();
 }
 
 /*
@@ -207,7 +268,9 @@ function outputSubreddit( responseObj, afterParam )
         }
         var myDeckIndex = Math.floor( actualIndex / 4 );
         var myData = { "title" : "DUMMY-CARD" };
-        outputCard( cardDecks, myDeckIndex, myData );
+        var dummyCard = outputCard( cardDecks, myDeckIndex, myData );
+        dummyCard.addClass( "dummy-card" );
+        
     }
 
     //request the next set of results from the subreddit in one second
