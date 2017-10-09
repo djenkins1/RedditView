@@ -3,6 +3,8 @@
     Author: Dilan Jenkins
     Project: RedditViewer
 */
+//the name of the cookie to keep track of the list of favorite subreddits
+var FAV_COOKIE_KEY = "listfave3";
 
 //the default subreddit to search for,also updated to the last subreddit searched this session
 var currentSubreddit = "Yogscast";
@@ -234,10 +236,35 @@ function handleSubreddit( data, status )
 */
 function addFavorite( favStr )
 {
-    //TODO: prevent xss
-    //TODO: cookies
-    //TODO: add favStr to dropdown menu
+    var favList = JSON.parse( Cookies.get( FAV_COOKIE_KEY ) )
+    favList.push( favStr.toLowerCase() );
+    favList.sort();
+    Cookies.set( FAV_COOKIE_KEY , JSON.stringify( favList ) );
+    showFavorites();
     console.log( favStr );
+}
+
+//shows the favorite subreddits in a dropdown menu
+function showFavorites()
+{
+    //remove all the old favorite buttons
+    $( "button.redditSelect" ).remove();
+    //if the cookie is undefined,create it and initialize to empty list
+    if ( Cookies.get(FAV_COOKIE_KEY) == undefined )
+    {
+        console.log( "COOKIE RESET" );
+        Cookies.set( FAV_COOKIE_KEY, "[]", { expires: 7 } );
+    }
+
+    //go through the list within the cookie,and add a button for each of the items
+    var favList = JSON.parse( Cookies.get( FAV_COOKIE_KEY ) );
+    for ( var favKey in favList )
+    {
+        var currentButton = $( "<button />" ).addClass( "dropdown-item" ).addClass( "redditSelect" ).attr( "type" , "button" );
+        //using .text() function prevents XSS
+        currentButton.text( favList[ favKey ] );
+        $( "#favoriteList" ).append( currentButton );
+    }
 }
 
 // event handler for the modal to add a favorite, calls addFavorite with the input value
@@ -251,10 +278,11 @@ function handleAddFavorite()
 // setups the event handlers that are common between Quickview and Postview
 function setupHandlers()
 {
-    $( "button.redditSelect" ).on( "click" , searchSubredditByClick );
+    $(document.body).on('click',"button.redditSelect",searchSubredditByClick );
     $( "#searchButton" ).on( "click" , searchSubredditByForm );
     $( "#favPopModal" ).on( "click" , function() { $( "#favModal" ).modal(); } );
     $( "#addFavSubmitBtn" ).on( "click" , handleAddFavorite );
+    showFavorites();
 }
 
 
