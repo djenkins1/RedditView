@@ -1,8 +1,27 @@
+/*
+    File: siteutil.js
+    Author: Dilan Jenkins
+    Project: RedditViewer
+*/
+
+//the default subreddit to search for,also updated to the last subreddit searched this session
 var currentSubreddit = "Yogscast";
 
+//the number of times the progress bar has been incremented,used for smooth increase of progress
 var progressUpdatedTimes = 0;
+
+//whether the progress bar can be updated at the moment
 var canUpdateProgress = true;
 
+/*
+    Sends AJAX request for a subreddit given by name
+    Calls handleSubreddit function when response is received
+    Updates currentSubreddit to the subredditName given
+    Parameters:
+        subredditName, string representing the subreddit to search for
+        afterParam, optional string representing which posts to get. Used for pagination.
+    Returns: Nothing
+*/
 function requestSubreddit( subredditName, afterParam )
 {
     currentSubreddit = subredditName;
@@ -13,21 +32,33 @@ function requestSubreddit( subredditName, afterParam )
     }
 
     updateProgress();
+    //escape any characters in the subreddit name so as to send in url
     var urlGet =  "https://www.reddit.com/r/" + encodeURIComponent( subredditName ) + "/new/.json" 
     $.get( urlGet, paramObj, handleSubreddit );
 }
 
+// hides the progress bar
 function hideProgress()
 {
     $( "#waiting" ).css( "display" , "none" );
     setProgress( 0 );
 }
 
+// smoothly drives the progress up to max on the progress bar
+// then calls hideProgress when progress is at max
 function finishProgress()
 {
     animateIncrementProgress( 105, hideProgress, 80 );
 }
 
+/*
+    Sets the progress of the progress bar to the value given.
+    Also stops the progress bar from being updated further until canUpdateProgress is set to true.
+    Resets progressUpdatedTimes back to zero
+    Parameters:
+        val, integer value to set the progress bar to
+    Return: Nothing
+*/
 function setProgress( val )
 {
     progressUpdatedTimes = 0;
@@ -39,6 +70,14 @@ function setProgress( val )
     );
 }
 
+/*
+    Animates the progress on the progress bar so that it has smoother increases.
+    Parameters:
+        maxValue, the value that the progress bar should go up to for this particular call
+        onFinish, the function to be called when the maxValue is reached
+        time, how fast the progress bar should be updated,integer in milliseconds
+    Return: Nothing
+*/
 function animateIncrementProgress( maxValue, onFinish, time )
 {
     if ( !canUpdateProgress )
@@ -62,6 +101,9 @@ function animateIncrementProgress( maxValue, onFinish, time )
     );
 }
 
+// updates the progress bar based on the progressUpdatedTimes variable
+// will not update the progress bar if canUpdateProgress is false
+// calls animateIncrementProgress function to animate the increase in progress
 function updateProgress()
 {
     if ( !canUpdateProgress )
@@ -73,52 +115,78 @@ function updateProgress()
     animateIncrementProgress( maxValue, function() { }, 750 );
 }
 
+/*
+    Starts a brand new search for a particular subreddit
+    Parameters:
+        subredditName, the name of the subreddit to search
+        ignoreWaiting, whether this function should ignore the fact that the progress bar is shown(presumably a request is waited on)
+        afterParam, the parameter to send to reddit to get paginated results
+    Returns: Nothing
+*/
 function searchSubreddit( subredditName, ignoreWaiting, afterParam )
 {
+    // if the progress bar is being shown, then a search is currently being done so return(unless ignoreWaiting is true)
     if ( !ignoreWaiting && $( "#waiting" ).css( "display" ) != "none" )
     {
         return;
     }
 
+    //set the progress bar down to zero,and show the progress bar(allowing for it to be updated ny setting canUpdateProgress to true)
     setProgress( 0 );
     canUpdateProgress = true;
     $( "#waiting" ).css( "display" , "flex" );
+    //clear out any old results/text in the mainBody
     clearBody( "#mainBodyDown" );
+    //send a request for the subreddit given
     requestSubreddit( subredditName, afterParam );
 }
 
+/*
+    Clears the innerHTML of the DOM object given.
+    Parameters:
+        ofObj, the DOM object whose innerHTML should be cleared
+    Returns: Nothing
+*/
 function clearBody( ofObj )
 {
     $( ofObj ).html( "" );
 }
 
+/*
+    Wrapper function for searching subreddit by clicking on a button
+    Returns: Nothing
+*/
 function searchSubredditByClick()
 {
     searchSubreddit( $( this ).text(), false );
 }
 
+/*
+    Wrapper function for searching subreddit by using the redditSearch input box
+    Returns: Nothing
+*/
 function searchSubredditByForm()
 {
     searchSubreddit( $( "#redditSearch" ).val(), false );
 }
 
-function shufflePeriods()
-{
-    if ( $( "#waiting" ).css( "display" ) == "none" )
-    {
-        return;
-    }
-
-    $( "#waiting" ).text( $( "#waiting" ).text() + "." );
-}
-
+/*
+    Handler for when a link is right clicked
+    Updates the style of the link
+    Returns: Nothing
+*/
 function rightClickLink()
 {
     $( this ).css( "color" , "black" );
     $( this ).css( "opacity" , "0.25" );
 }
 
-//convert the date to a unix timestamp and return said timestamp
+/*
+    Convert the date to a unix timestamp and return said timestamp
+    Parameters:
+        dateStr, string representing the date to be converted
+    Returns: unix timestamp in seconds since the unix epoch
+*/
 function convertDateToTime( dateStr )
 {
     var dateObj = new Date( dateStr );
@@ -126,14 +194,23 @@ function convertDateToTime( dateStr )
     return Math.floor( dateObj.getTime() / 1000 );
 }
 
-// returns string of the current date formatted like so: M/D/YYYY
-// ex: 5/16/2015
+/*
+    Returns string of the current date formatted like so: M/D/YYYY
+    ex: 5/16/2015
+*/
 function getFormatCurrentDate()
 {
     var d = new Date();
     return ( d.getMonth() + 1 ) + "/" + d.getDate() + "/" + d.getFullYear();
 }
 
+/*
+    Function called when a response is received from searching a subreddit
+    Parameters:
+        data, the response from the server. Assumed to be JSON object already
+        status, the status string sent from the server. If not success then log the status and exit.
+    Returns: Nothing
+*/
 function handleSubreddit( data, status )
 {
     if ( status != "success" )
@@ -142,16 +219,19 @@ function handleSubreddit( data, status )
         return;
     }
 
-    console.log( data );
-    //var responseObjAll = JSON.parse( data );
+    // get the data needed out from the response and call outputSubreddit
     var responseObjAll = data;
-    //var responseObj = responseObjAll.body.data.children;
     var responseObj = responseObjAll.data.children;
     updateProgress();
-    //outputSubreddit( responseObj,responseObjAll.body.data.after );
     outputSubreddit( responseObj,responseObjAll.data.after );
 }
 
+/*
+    Adds the favStr to the list of favorites, both to the actual HTML/CSS on the page and to the model held in cookies.
+    Parameters:
+        favStr, name of a subreddit that is to be added to the list of favorites
+    Returns: Nothing
+*/
 function addFavorite( favStr )
 {
     //TODO: prevent xss
@@ -160,12 +240,15 @@ function addFavorite( favStr )
     console.log( favStr );
 }
 
+// event handler for the modal to add a favorite, calls addFavorite with the input value
+// also closes the modal
 function handleAddFavorite()
 {
     addFavorite( $( "#favInput" ).val() );
     $( "#closeFavModal" ).click();
 }
 
+// setups the event handlers that are common between Quickview and Postview
 function setupHandlers()
 {
     $( "button.redditSelect" ).on( "click" , searchSubredditByClick );
