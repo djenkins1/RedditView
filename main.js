@@ -252,7 +252,6 @@ function outputSubreddit( responseObj, afterParam )
     //if there were no posts that were displayed then return and stop searching
     if ( actualIndex == -1 )
     {
-        console.log( "STOPPED EMPTY" );
         stopSearch( "STOPPED EMPTY" );
         return;
     }
