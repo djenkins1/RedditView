@@ -15,6 +15,11 @@ div.dummy-card
     padding-top: 15px;
 }
 
+.card-img-top 
+{
+    width: 100%;
+}
+
 a.card-link
 {
     color: white;

@@ -105,10 +105,10 @@ function createCardImage( thumbnail )
     var cardImg = $( "<img />" );
     cardImg.addClass( "card-img-top" );
     cardImg.attr( "alt" , "Card image cap" );
-    cardImg.attr( "height" , 180 );
+    //cardImg.attr( "height" , 180 );
 
     //if the thumbnail exists,set the cardImg src to the thumbnail url
-    if ( thumbnail )
+    if ( thumbnail && thumbnail != "self" && thumbnail != "image" && thumbnail != "default" )
     {
         cardImg.attr( "src" , thumbnail );
     }
