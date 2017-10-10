@@ -36,7 +36,20 @@ function requestSubreddit( subredditName, afterParam )
     updateProgress();
     //escape any characters in the subreddit name so as to send in url
     var urlGet =  "https://www.reddit.com/r/" + encodeURIComponent( subredditName ) + "/new/.json" 
-    $.get( urlGet, paramObj, handleSubreddit );
+    $.get( urlGet, paramObj, handleSubreddit ).fail( failSearch );
+}
+
+function prependAlert( messageStr )
+{
+    var myAlert = $( "<div />" ).addClass( "alert" ).addClass( "alert-danger" ).text( messageStr );
+    $( "#mainBodyDown" ).prepend( myAlert );
+}
+
+function failSearch()
+{
+    console.log( "Search failed" );
+    prependAlert( "The search was not successful, please try again." );
+    hideProgress();
 }
 
 // hides the progress bar
@@ -218,6 +231,8 @@ function handleSubreddit( data, status )
     if ( status != "success" )
     {
         console.log( status );
+        prependAlert( "Something went wrong." );
+        setProgress( 0 );
         return;
     }
 
@@ -241,7 +256,6 @@ function addFavorite( favStr )
     favList.sort();
     Cookies.set( FAV_COOKIE_KEY , JSON.stringify( favList ) );
     showFavorites();
-    console.log( favStr );
 }
 
 //shows the favorite subreddits in a dropdown menu
@@ -252,7 +266,6 @@ function showFavorites()
     //if the cookie is undefined,create it and initialize to empty list
     if ( Cookies.get(FAV_COOKIE_KEY) == undefined )
     {
-        console.log( "COOKIE RESET" );
         Cookies.set( FAV_COOKIE_KEY, "[]", { expires: 7 } );
     }
 
