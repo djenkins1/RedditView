@@ -296,6 +296,35 @@ function setupHandlers()
     $( "#favPopModal" ).on( "click" , function() { $( "#favModal" ).modal(); } );
     $( "#addFavSubmitBtn" ).on( "click" , handleAddFavorite );
     showFavorites();
+    setupSearchTypeahead();
 }
 
+//setups the typeahead autocomplete for the search box
+function setupSearchTypeahead()
+{
+    var subredditHound = new Bloodhound(
+    {
+        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('keyword'),//only compare the keyword attribute of the object,and ignore whitespace
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        remote: {
+            url: 'https://www.reddit.com/subreddits/search.json?q=%QUERY',
+            wildcard: '%QUERY',
+            filter: function (response) 
+            {
+                return $.map(response.data.children, function( subreddit ) 
+                {
+                    //clunky solution for showing all the results,have keyword be the actual string that was searched
+                    //but use title as the string shown in autocomplete dropdown
+                    return { keyword: $( "#redditSearch" ).val(), title: subreddit.data.display_name };
+                });
+            }
+        }
+    });
+
+    $('#redditSearch').typeahead(null, {
+      name: 'subreddits',
+      display: 'title',
+      source: subredditHound
+    });
+}
 

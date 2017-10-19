@@ -50,3 +50,12 @@ a.card-link:hover
     margin-right: 5px !important;
     display: inline-block;
 }
+
+.tt-suggestion 
+{
+	display: block;
+    border-bottom: solid black 1px;
+    background: lightgray;
+    width: 15em;
+    padding: 0.5em;
+}
