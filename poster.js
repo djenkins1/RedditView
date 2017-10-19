@@ -120,7 +120,7 @@ $( document ).ready( function()
     //hide the progress bar since there is no search happening at the moment
     $( "#waiting" ).css( "display" , "none" );
     //Add text to the mainBody instructing user to search a subreddit
-    $( "#mainBodyDown" ).html( "Select or search for a subreddit to begin." );
+    $( "#mainBodyDown" ).html( "Welcome to Postview.<br>Here you can see the top 10 users who have posted to a particular subreddit.<br>Select or search for a subreddit to begin." );
     //call function to setup the event handlers
     setupHandlers();
 });

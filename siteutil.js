@@ -7,7 +7,7 @@
 var FAV_COOKIE_KEY = "listfave3";
 
 //the default subreddit to search for,also updated to the last subreddit searched this session
-var currentSubreddit = "Yogscast";
+var currentSubreddit = "";
 
 //the number of times the progress bar has been incremented,used for smooth increase of progress
 var progressUpdatedTimes = 0;
@@ -63,7 +63,7 @@ function hideProgress()
 // then calls hideProgress when progress is at max
 function finishProgress()
 {
-    animateIncrementProgress( 105, hideProgress, 80 );
+    animateIncrementProgress( 100, hideProgress, 80 );
 }
 
 /*
@@ -81,6 +81,7 @@ function setProgress( val )
     $( '#waiting .progress-bar' ).each( function()
     {
         $( this ).css( 'width', val + '%' ).attr( 'aria-valuenow', val ); 
+        $( this ).text( val + "%" );
     }
     );
 }
@@ -106,6 +107,8 @@ function animateIncrementProgress( maxValue, onFinish, time )
         if ( newVal <= maxValue )
         {
             $( this ).css( 'width', newVal + '%' ).attr( 'aria-valuenow', newVal ); 
+            $( this ).css( "text-align" , "right" );
+            $( this ).text( newVal + "%" );
             setTimeout( function() { animateIncrementProgress( maxValue, onFinish, time ) } , time );
         }
         else

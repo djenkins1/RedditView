@@ -59,17 +59,6 @@ function repositionCards()
         var deckIndex = Math.floor( ( lastCardIndex + i ) / 4 );
         $( myDecks ).eq( deckIndex ).append( dummyCards[ i ] );
     }
-
-    //remove any rows that are all dummy-cards
-    /*
-    var lastDeck = $( myDecks ).eq( myDecks.length - 1 );
-    if ( $( lastDeck ).children( ".dummy-card" ) == 4 )
-    {
-
-    }
-    */
-
-
 }
 
 //creates and returns an h4.card-title skeleton
@@ -283,8 +272,13 @@ function outputSubreddit( responseObj, afterParam )
 */
 $( document ).ready( function()
 {
+    //set the date on the searchDate input to today's date    
     $( "#searchDate" ).val( getFormatCurrentDate() );
-    searchSubreddit( currentSubreddit, true );
+    //hide the progress bar since there is no search happening at the moment
+    $( "#waiting" ).css( "display" , "none" );
+    //Add text to the mainBody instructing user to search a subreddit
+    $( "#mainBodyDown" ).html( "Welcome to Quickview. <br>Here you can see posts for a particular subreddit that were posted after a certain date. <br>Select or search for a subreddit to begin." );
+    //call function to setup the event handlers
     setupHandlers();
 });
 
