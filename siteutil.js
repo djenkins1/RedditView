@@ -6,6 +6,9 @@
 //the name of the cookie to keep track of the list of favorite subreddits
 var FAV_COOKIE_KEY = "listfave3";
 
+//the key used for local storage to store favorite list
+var FAV_STORE_KEY = "favelister";
+
 //the default subreddit to search for,also updated to the last subreddit searched this session
 var currentSubreddit = "";
 
@@ -254,10 +257,29 @@ function handleSubreddit( data, status )
 */
 function addFavorite( favStr )
 {
-    var favList = JSON.parse( Cookies.get( FAV_COOKIE_KEY ) )
-    favList.push( favStr.toLowerCase() );
-    favList.sort();
-    Cookies.set( FAV_COOKIE_KEY , JSON.stringify( favList ) );
+    var favList;
+
+    //if localStorage is supported in this browser then use it,otherwise fallback to cookies
+    if (typeof(Storage) !== "undefined") 
+    {
+        if ( localStorage.getItem( FAV_STORE_KEY ) == undefined )
+        {
+            localStorage.setItem( FAV_STORE_KEY , "[]" );
+        }
+        favList = JSON.parse( localStorage.getItem( FAV_STORE_KEY ) );
+        favList.push( favStr.toLowerCase() );
+        favList.sort();
+        localStorage.setItem( FAV_STORE_KEY, JSON.stringify( favList ) );
+    } 
+    else 
+    {
+        // Sorry! No Web Storage support..
+        favList = JSON.parse( Cookies.get( FAV_COOKIE_KEY ) )
+        favList.push( favStr.toLowerCase() );
+        favList.sort();
+        Cookies.set( FAV_COOKIE_KEY , JSON.stringify( favList ) );
+    }
+
     showFavorites();
 }
 
@@ -266,14 +288,32 @@ function showFavorites()
 {
     //remove all the old favorite buttons
     $( "button.redditSelect" ).remove();
-    //if the cookie is undefined,create it and initialize to empty list
-    if ( Cookies.get(FAV_COOKIE_KEY) == undefined )
+
+    var favList;
+    //if localStorage is supported in this browser then use it,otherwise fallback to cookies
+    if ( typeof( Storage ) !== "undefined") 
     {
-        Cookies.set( FAV_COOKIE_KEY, "[]", { expires: 7 } );
+        //if the item in localStorage is undefined,create it and initialize to empty list
+        if ( localStorage.getItem( FAV_STORE_KEY ) == undefined )
+        {
+            localStorage.setItem( FAV_STORE_KEY , "[]" );
+        }
+
+        favList = JSON.parse( localStorage.getItem( FAV_STORE_KEY ) );
+    } 
+    else 
+    {
+        // Sorry! No Web Storage support..
+        //if the cookie is undefined,create it and initialize to empty list
+        if ( Cookies.get(FAV_COOKIE_KEY) == undefined )
+        {
+            Cookies.set( FAV_COOKIE_KEY, "[]", { expires: 7 } );
+        }
+
+        favList = JSON.parse( Cookies.get( FAV_COOKIE_KEY ) );
     }
 
     //go through the list within the cookie,and add a button for each of the items
-    var favList = JSON.parse( Cookies.get( FAV_COOKIE_KEY ) );
     for ( var favKey in favList )
     {
         var currentButton = $( "<button />" ).addClass( "dropdown-item" ).addClass( "redditSelect" ).attr( "type" , "button" );
