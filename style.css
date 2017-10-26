@@ -59,3 +59,24 @@ a.card-link:hover
     width: 15em;
     padding: 0.5em;
 }
+
+div.carousel-item
+{
+    background-color: black;
+}
+
+div.carousel-item > img
+{
+    width: 50%; 
+    margin: 0 auto
+}
+
+#topPostCarousel
+{
+    display: none;
+}
+
+div.carousel-caption > h3,div.carousel-caption > p
+{
+    color: black;
+}
