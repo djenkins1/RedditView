@@ -55,21 +55,15 @@ function showPosterResults( allPosterDict, finishFunc )
     for ( var i = keyValues.length - 1; i >= 0; i-- )
     {
         //stop when the top 10 posters have been displayed
-        //since loop is going backwards,stop 11 positions from the end of the array
         if ( i < keyValues.length - 11 )
         {
             break;
         }
-
-        //add a li element with a link to the user,have text containing total posts
         var currentValuePair = keyValues[ i ];
         var myItem = $( "<li />" );
         myItem.addClass( "list-group-item" );
-        var myItemLink = $( "<a />" );
-        myItemLink.attr( "href" , "https://www.reddit.com/user/" + encodeURIComponent( currentValuePair[ 0 ] ) );
-        myItemLink.text( currentValuePair[ 0 ] + " : " + currentValuePair[ 1 ] );
+        myItem.text( currentValuePair[ 0 ] + " : " + currentValuePair[ 1 ] );
         $( myGroup ).append( myItem ); 
-        $( myItem ).append( myItemLink );
     }
 
     //if the function given is not undefined,call it since we are finished here
