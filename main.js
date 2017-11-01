@@ -4,8 +4,6 @@
     Project: RedditViewer
 */
 
-var bestPosts = [];
-
 //creates and returns a div.card skeleton
 //does NOT add the card to the DOM
 function createCard()
@@ -80,71 +78,6 @@ function createCardBody()
     divBody.addClass( "card-body" );
 
     return divBody;
-}
-
-/*
-    adds the given post to the list of top rated posts for the particular subreddit 
-        if there is space or it is better than the lowest score in the list currently
-    Parameters:
-        postData,json object that contains the data on the post to be added
-    Returns:
-        true if the post was added to the bestPosts array, or false otherwise
-*/
-function addPostIfBetter( postData )
-{
-    var MAX_BEST = $( "#topPostCarousel div.carousel-item" ).length;
-    if ( bestPosts.length < MAX_BEST )
-    {
-        bestPosts.push( postData );
-        return true;
-    }
-
-    var lowest = 0;
-    var i;
-    //starting at the second element,compare each element to the lowest element
-    //if the element at i is lower than the lowest,set the lowest index to i
-    //when the loop is done the post with the minimum score in the list will be found
-    for ( i = 1; i < bestPosts.length; i++ )
-    {
-        if ( bestPosts[ i ].score < bestPosts[ lowest ].score )
-        {
-            lowest = i;
-        }
-    }
-
-    //if the lowest element in the list is less than the post given,then overwrite the index with the post given
-    if ( bestPosts[ lowest ].score < postData.score )
-    {
-        bestPosts[ lowest ] = postData;
-        return true;
-    }
-
-    //the element was not added to the list,return false
-    return false;
-}
-
-//puts the best posts into the carousel and displays it on the page
-//when done,clears out the bestPosts array
-function showBestPostsCarousel()
-{
-    var carouselItems = $( "#topPostCarousel div.carousel-item" );
-    for ( var i = 0; i < bestPosts.length; i++ )
-    {
-        var mySlide = $( carouselItems ).get( i );
-        var myPost = bestPosts[ i ];
-        //set the img src to thumbnail or emptyThumb.jpg
-        $( mySlide ).find( "img" ).attr( "src" , getThumbnailSrc( myPost.thumbnail ) );;
-        //set the h3 > a href url to the permalink of the post
-        $( mySlide ).find( "h3 > a" ).attr( "href" , "https://www.reddit.com" + myPost.permalink );
-        //set the h3 text to the title of the post
-        $( mySlide ).find( "h3 > a" ).text( myPost.title );
-    }
-
-    //display the carousel
-    $( "#topPostCarousel" ).css( "display" , "block" );
-
-    //clear out the bestPosts array for the next search
-    bestPosts = [];
 }
 
 /*
@@ -266,7 +199,6 @@ function stopSearch( message )
     console.log( message );
     finishProgress();
     repositionCards();
-    showBestPostsCarousel();
 }
 
 /*
@@ -306,16 +238,6 @@ function outputSubreddit( responseObj, afterParam )
             continue;
         }
         actualIndex++;
-
-        if ( addPostIfBetter( myData ) )
-        {
-            console.log( "POST ADDED TO BEST " + myData.id + " with score " + myData.score );
-            console.log( bestPosts );
-        }
-        else
-        {
-            console.log( "POST NOT BEST " + myData.id + " with score " + myData.score );
-        }
 
         //if the card deck does not exist,create a new card deck and use it as the card deck for this row
         var myDeckIndex = Math.floor( actualIndex / 4 );
